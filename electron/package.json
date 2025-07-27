@@ -1,0 +1,85 @@
+{
+  "name": "table-talk-electron",
+  "version": "1.0.0",
+  "description": "TableTalk - Desktop TTRPG Chat Application",
+  "main": "main.js",
+  "author": "Kevin McSharry",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "npm run build:prepare && electron-builder",
+    "build:prepare": "npm run copy:server && npm run copy:client",
+    "copy:server": "npx cpx2 \"../server/dist/**/*\" \"dist/server\" && npx cpx2 \"../server/node_modules/**/*\" \"dist/server/node_modules\"",
+    "copy:client": "npx cpx2 \"../client/dist/**/*\" \"dist/client\"",
+    "build:win": "npm run build:prepare && electron-builder --win",
+    "build:mac": "npm run build:prepare && electron-builder --mac",
+    "build:linux": "npm run build:prepare && electron-builder --linux",
+    "clean": "rmdir /S /Q dist"
+  },
+  "devDependencies": {
+    "cpx2": "^8.0.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "@dice-roller/rpg-dice-roller": "^5.5.1",
+    "qrcode": "^1.5.3",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.1.0"
+  },
+  "build": {
+    "appId": "com.kevinmcsharry.tabletalk",
+    "productName": "TableTalk",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "dist/**/*",
+      "assets/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "dist/server/node_modules",
+        "to": "server/node_modules"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.games"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png",
+      "category": "Game"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

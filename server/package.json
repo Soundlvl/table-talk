@@ -1,0 +1,65 @@
+{
+  "name": "table-talk-server",
+  "version": "1.0.0",
+  "description": "The server for the Table Talk application, which serves the client and handles game logic via WebSockets.",
+  "author": "Kevin McSharry",
+  "license": "MIT",
+  "main": "dist/server/server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist/server/server.js",
+    "start:dev": "nodemon --watch ./ --ext ts,json --exec \"ts-node ./server.ts\"",
+    "package": "npm run build && pkg .",
+    "prepackage": "npm run build",
+    "build:win": ".\\node_modules\\.bin\\tsc && node build-win.js",
+    "build:win-icon": "npm run build && node build-with-icon.js",
+    "package:linux": "npm run build && pkg . --targets node18-linux-x64",
+    "package:macos": "sh ./build-mac.sh",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": "dist/server/server.js",
+  "pkg": {
+    "scripts": "dist/**/*.js",
+    "options": ["--icon", "assets/icon.ico", "--no-bytecode"],
+    "assets": [
+      "../client/dist/**/*",
+      "node_modules/@dice-roller/rpg-dice-roller/lib/**/*",
+      "node_modules/@dice-roller/rpg-dice-roller/package.json",
+      "node_modules/@dice-roller/rpg-dice-roller/types/**/*",
+      "node_modules/mathjs/**/*",
+      "node_modules/complex.js/**/*",
+      "node_modules/decimal.js/**/*",
+      "node_modules/fraction.js/**/*",
+      "node_modules/seedrandom/**/*",
+      "node_modules/tiny-emitter/**/*",
+      "node_modules/typed-function/**/*"
+    ],
+    "targets": [
+      "node18-win-x64",
+      "node18-linux-x64"
+    ],
+    "outputPath": "release"
+  },
+  "dependencies": {
+    "@dice-roller/rpg-dice-roller": "^5.5.1",
+    "qrcode": "^1.5.3",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "@types/qrcode": "^1.5.5",
+    "@types/socket.io": "^3.0.2",
+    "@types/uuid": "^9.0.8",
+    "@types/ws": "^8.5.10",
+
+    "nodemon": "^3.1.4",
+    "pkg": "^5.8.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+/build
+/dist
+/client/dist
+/server/dist
+/electron/dist
+/electron/release
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code
+.claude/
+
+# TableTalk specific
+tables/*/gamestate.json
+tables/*/uploads/
+*.exe
+*.dmg
+*.AppImage
+tabletalk-debug.log
+
+# Temporary files
+*.tmp
+*.temp
+*.log

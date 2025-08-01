@@ -3,7 +3,7 @@
 <div align="center">
   <img src="client/public/TT.png" alt="TableTalk Logo" width="200"/>
   
-  **A TTRPG chat app for running in person games.**
+  **A TTRPG chat app for running games in person.**
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   [![Electron](https://img.shields.io/badge/Electron-28.0.0-9feaf9.svg)](https://electronjs.org/)
@@ -11,16 +11,16 @@
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.4.5-blue.svg)](https://www.typescriptlang.org/)
 </div>
 
-## ✨ Features
+## Features
 
-### 🎮 **Immersive Gaming Experience**
+### **Immersive Gaming Experience**
 - **Language System**: Speak in different in-game languages with automatic obfuscation for unknown languages
 - **Empowered Table Talk**: Send messages to the GM while other players are speaking to eachother 
 - **Private & Secure Chat**: Your game's chat history is stored locally and securely
 - **Fantasy & Sci-Fi Themes**: Choose themes that match your campaign's aesthetic
-- **Accessibility Options**: High-contrast mode and dyslexia-friendly fonts
+- **Accessibility Options**: High-contrast mode and dyslexia-friendly fonts toggle per user
 
-### 🎲 **Rich Chat Features**
+### **Rich Chat Features**
 - **Integrated Dice Roller**: Roll dice directly in chat using standard notation (`/roll 2d6+5`)
 - **Whisper Mode**: Send private messages to specific players or the GM
 - **Emotes**: Express character actions with `/emote` commands
@@ -28,19 +28,20 @@
 - **Real-time Communication**: Powered by Socket.IO for instant messaging
 
 
-### 🧙‍♂️ **Game Master Tools**
+###  **Game Master Tools**
 - **NPC Management**: Speak as different NPCs with the `/as` command
 - **Player Language Control**: Grant or remove character languages
 - **Chat Export**: Save entire game sessions as JSON files
 - **Player Management Dashboard**: Comprehensive GM controls
+- **GM Omnicience**: The Game Master always understands all languages and sees all private messages
 
-### 🌐 **Cross-Platform Desktop App**
+### **Cross-Platform Desktop App**
 - **No Installation Required**: Portable executable files
 - **Windows, macOS, Linux**: Built with Electron for universal compatibility
 - **QR Code Sharing**: Quick mobile device connections
 - **Network Discovery**: Automatic local network connection URLs
 
-## 📥 Download & Installation
+## Download & Installation
 
 ### For Players
 
@@ -55,12 +56,12 @@
 3. **Share connection info** with your players via the built-in QR code or URLs
 4. **Create your table** and manage your campaign
 
-## 🎯 Quick Start
+## Quick Start
 
 ### Creating a Game (GM)
 1. Launch TableTalk
 2. Create a new table with your campaign name
-3. Set up world languages and themes from the GM menue
+3. Set up world languages and pick a theme from the GM menue
 4. Share the connection URL or QR code with players
 5. Start your adventure!
 
@@ -73,7 +74,7 @@
    - TIP :enter the name of a previously created character to rejoin without selecting languages again
 4. Jump into the chat!
   - Optionally upload an avatar from settings
-## 💬 Chat Commands
+## Chat Commands
 
 ### General Commands
 ```
@@ -96,7 +97,7 @@
 /settheme <theme>   Change table theme (fantasy/sci-fi)
 ```
 
-## 🛠️ Development Setup
+## Development Setup
 
 ### Prerequisites
 - Node.js 18+ 
@@ -105,8 +106,8 @@
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/table-talk-app.git
-cd table-talk-app
+git clone https://github.com/soundlvl/table-talk.git
+cd table-talk
 
 # Install dependencies for all components
 cd client && npm install && cd ..
@@ -134,31 +135,13 @@ npm run dev
 # Prepare and build for current platform
 cd electron
 npm run build
-
+S
 # Build for specific platforms
 npm run build:win    # Windows
 npm run build:mac    # macOS
 npm run build:linux  # Linux
 ```
 
-## 🏗️ Architecture
-
-TableTalk is built with a modern, modular architecture:
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│                 │    │                 │    │                 │
-│   React Client  │◄──►│  Socket.IO      │◄──►│ Electron Main   │
-│   (Frontend)    │    │  Server         │    │ Process         │
-│                 │    │  (Backend)      │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Vite Build    │    │  TypeScript     │    │   Electron      │
-│   System        │    │  Node.js        │    │   Builder       │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
 
 ### Tech Stack
 - **Frontend**: React 19, TypeScript, Vite
@@ -169,27 +152,18 @@ TableTalk is built with a modern, modular architecture:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
-
-### Development Guidelines
-1. Follow the existing code style and TypeScript patterns
-2. Add appropriate type definitions for new features
-3. Test your changes across different platforms when possible
-4. Update documentation for new features
+Contributions are welcome! 
 
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](license) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **@dice-roller/rpg-dice-roller** - Excellent dice rolling library
-- **Socket.IO** - Real-time communication framework
-- **Electron** - Cross-platform desktop app framework
-- **React** - UI framework
 - **TTRPG Community** - For inspiration and feedback
 
-## 📞 Support
+## Support
 
 - **Issues**: [GitHub Issues](../../issues)
 - **Discussions**: [GitHub Discussions](../../discussions)
@@ -201,5 +175,5 @@ This project is licensed under the MIT License - see the [LICENSE](license) file
   
   <br>
   
-  *Happy Gaming! 🎲*
+  *Happy Gaming! *
 </div>

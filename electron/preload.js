@@ -19,4 +19,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getPlatform: () => process.platform
 });
 
-console.log('[PRELOAD] TableTalk preload script loaded');
+// Only log in development mode
+if (process.env.NODE_ENV === 'development' || process.argv.includes('--dev')) {
+    console.log('[PRELOAD] TableTalk preload script loaded');
+}

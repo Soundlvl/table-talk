@@ -1,7 +1,7 @@
 // client/src/TableAdmin.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
-import { Table, ImportedGameState, AdminAuthResultPayload } from '../../shared/types';
+import { Table, ImportedGameState, } from '../../shared/types';
 import './styles.css';
 
 interface TableAdminProps {
@@ -15,9 +15,6 @@ function TableAdmin({ socket, isConnected, onBack }: TableAdminProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [password, setPassword] = useState<string>('');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [authError, setAuthError] = useState<string>('');
 
   const fetchTables = useCallback(() => {
     // No need to check isAuthenticated here, this is only called when authenticated.
@@ -27,36 +24,16 @@ function TableAdmin({ socket, isConnected, onBack }: TableAdminProps) {
     }
   }, [socket, isConnected]);
 
-  // New useEffect to fetch tables on successful authentication.
+  // Fetch tables when component loads
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchTables();
-    }
-  }, [isAuthenticated, fetchTables]);
+    fetchTables();
+  }, [fetchTables]);
 
 
   useEffect(() => {
     if (!socket || !isConnected) {
-      setIsAuthenticated(false); // Reset auth if connection is lost
       return;
     }
-
-    const handleAuthResult = (data: AdminAuthResultPayload) => {
-      if (data.success) {
-        setIsAuthenticated(true);
-        setAuthError('');
-        setPassword('');
-        // fetchTables will now be called by the useEffect hook above.
-      } else {
-        setIsAuthenticated(false);
-        setAuthError(data.message || 'Authentication failed.');
-      }
-    };
-    
-    const handleUnauthorized = () => {
-      setIsAuthenticated(false);
-      setAuthError('Session expired or unauthorized. Please log in again.');
-    };
 
     const handleTableList = (tableList: Table[]) => {
       // The server will only send this if we are authenticated.
@@ -71,7 +48,6 @@ function TableAdmin({ socket, isConnected, onBack }: TableAdminProps) {
     };
     
     const handleTableExport = (gameState: ImportedGameState) => {
-      if (!isAuthenticated) return;
       if (!gameState) {
         alert('Error: No game state received for export.');
         return;
@@ -94,23 +70,22 @@ function TableAdmin({ socket, isConnected, onBack }: TableAdminProps) {
       }
     };
 
-    socket.on('admin:authResult', handleAuthResult);
-    socket.on('admin:unauthorized', handleUnauthorized);
     socket.on('admin:tableList', handleTableList);
     socket.on('admin:tablesUpdated', handleTablesUpdated);
     socket.on('admin:tableExported', handleTableExport);
 
+    // Auto-authenticate immediately - no password required
+    socket.emit('admin:authenticate');
+
     return () => {
-      socket.off('admin:authResult', handleAuthResult);
-      socket.off('admin:unauthorized', handleUnauthorized);
       socket.off('admin:tableList', handleTableList);
       socket.off('admin:tablesUpdated', handleTablesUpdated);
       socket.off('admin:tableExported', handleTableExport);
     };
-  }, [socket, isConnected, fetchTables, isAuthenticated]);
+  }, [socket, isConnected, fetchTables]);
 
   const handleDeleteTable = (tableId: string, tableName: string) => {
-    if (socket && isConnected && isAuthenticated) {
+    if (socket && isConnected) {
       const isConfirmed = window.confirm(
         `Are you sure you want to permanently delete the table "${tableName}"?\nThis action cannot be undone.`
       );
@@ -121,18 +96,17 @@ function TableAdmin({ socket, isConnected, onBack }: TableAdminProps) {
   };
 
   const handleExportTable = (tableId: string) => {
-    if (socket && isConnected && isAuthenticated) {
+    if (socket && isConnected) {
       socket.emit('admin:exportTable', { tableId });
     }
   };
   
   const handleTriggerImport = useCallback(() => {
-    if (!isAuthenticated) return;
     fileInputRef.current?.click();
-  }, [isAuthenticated]);
+  }, []);
 
   const handleFileImport = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!socket || !isConnected || !isAuthenticated || !event.target.files) return;
+    if (!socket || !isConnected || !event.target.files) return;
     const file = event.target.files[0];
     if (!file) return;
 
@@ -170,53 +144,9 @@ function TableAdmin({ socket, isConnected, onBack }: TableAdminProps) {
       if (fileInputRef.current) fileInputRef.current.value = "";
     };
     reader.readAsText(file);
-  }, [socket, isConnected, isAuthenticated]);
-
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (socket && isConnected && password) {
-      socket.emit('admin:authenticate', password);
-    }
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setTables([]); // Clear data on logout
-  };
+  }, [socket, isConnected]);
 
 
-  if (!isAuthenticated) {
-    return (
-      <div className="admin-panel-container">
-        <header className="app-header">
-          <h1>Admin Panel</h1>
-          <div className="header-right-content">
-            <p className="connection-status">Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
-          </div>
-        </header>
-        <div className="admin-login-container">
-          <form onSubmit={handleLogin} className="admin-login-form">
-            <h2>Administrator Login</h2>
-            <p>Enter the administrator password to manage tables.</p>
-            <div className="form-input-group">
-              <input
-                id="adminPassword"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                disabled={!isConnected}
-                autoFocus
-              />
-              <button type="submit" disabled={!isConnected || !password}>Login</button>
-            </div>
-            {authError && <p className="admin-auth-error">{authError}</p>}
-             <button type="button" onClick={onBack} className="button-secondary back-button">Back to Table Selection</button>
-          </form>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="admin-panel-container">
@@ -232,7 +162,6 @@ function TableAdmin({ socket, isConnected, onBack }: TableAdminProps) {
         <div className="admin-actions-bar">
           <div>
             <button onClick={onBack} className="button-secondary">Back to Lobby</button>
-            <button onClick={handleLogout} className="button-secondary">Logout</button>
           </div>
           <button onClick={handleTriggerImport} className="button-primary" disabled={!isConnected}>Import Table from File</button>
         </div>

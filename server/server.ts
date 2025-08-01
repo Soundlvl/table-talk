@@ -11,31 +11,8 @@ import { onNewConnection } from './handlers/connectionHandler'; // Import the co
 
 let qrCodeSvg: string | null = null; // To store the generated QR code SVG
 
-// --- Security Check ---
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'TTadmin';
-if (ADMIN_PASSWORD === 'TTadmin') {
-    console.warn(`
-    \n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    \n[!!! SECURITY WARNING !!!] 
-    You are using the default administrator password ("TTadmin"). 
-    It is highly recommended to set a custom, secure password for the 
-    admin panel by setting the ADMIN_PASSWORD environment variable.
-    
-    Open a command prompt or terminal and navigate to the directory where
-    you run this server. 
-        
-        cd /path/to/your/project/directory
-
-    Then set the environment variable like this:
-
-        MAC OS Example: ADMIN_PASSWORD="your_secure_password_here" ./table-talk-server
-        Windows Example: set ADMIN_PASSWORD=your_new_secure_password table-talk-server.exe 
-
-    \n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    `);
-} else {
-    console.log('[SECURITY] Custom administrator password is set.');
-}
+// --- Admin Access ---
+console.log('[SECURITY] Admin access available through desktop app menu.');
 
 
 // --- Rate Limiter (replaces express-rate-limit) ---
@@ -262,7 +239,6 @@ const connectionContext = {
     io,
     gameTables,
     utils: { ...utils } as Utils,
-    ADMIN_PASSWORD,
 };
 
 // Main server initialization logic.

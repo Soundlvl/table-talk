@@ -13,9 +13,6 @@ const { spawn } = require('child_process');
 const net = require('net');
 const fs = require('fs');
 
-// Production-ready startup - minimal logging
-console.log(`[ELECTRON] TableTalk starting...`);
-
 // Configuration
 const CONFIG = {
     SERVER_PORT: 3001,
@@ -23,6 +20,9 @@ const CONFIG = {
     WINDOW_HEIGHT: 800,
     DEV_MODE: process.argv.includes('--dev')
 };
+
+// Production-ready startup
+if (CONFIG.DEV_MODE) console.log(`[ELECTRON] TableTalk starting...`);
 
 let mainWindow;
 let currentPort;
@@ -65,9 +65,11 @@ async function findAvailablePort(startPort = CONFIG.SERVER_PORT) {
  */
 function startServerWithPath(port, serverInfo) {
     return new Promise((resolve, reject) => {
-        console.log(`[ELECTRON] Starting TableTalk server on port ${port}...`);
-        console.log(`[ELECTRON] Using server path: ${serverInfo.serverPath}`);
-        console.log(`[ELECTRON] Working directory: ${serverInfo.workingDir}`);
+        if (CONFIG.DEV_MODE) {
+            console.log(`[ELECTRON] Starting TableTalk server on port ${port}...`);
+            console.log(`[ELECTRON] Using server path: ${serverInfo.serverPath}`);
+            console.log(`[ELECTRON] Working directory: ${serverInfo.workingDir}`);
+        }
         
         try {
             // Set environment variables for the server
@@ -84,57 +86,57 @@ function startServerWithPath(port, serverInfo) {
                 clientPath = path.join(__dirname, 'dist', 'client');
             }
             process.env.ELECTRON_CLIENT_PATH = clientPath;
-            console.log(`[ELECTRON] Setting client path: ${clientPath}`);
+            if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Setting client path: ${clientPath}`);
             
             // Verify client path exists and is accessible
             try {
                 const clientStat = require('fs').statSync(clientPath);
                 if (clientStat.isDirectory()) {
-                    console.log(`[ELECTRON] ✅ Client path is a valid directory`);
+                    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] ✅ Client path is a valid directory`);
                     // List some contents for debugging
                     const clientContents = require('fs').readdirSync(clientPath);
-                    console.log(`[ELECTRON] Client directory contents: ${clientContents.slice(0, 5).join(', ')}${clientContents.length > 5 ? '...' : ''}`);
+                    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Client directory contents: ${clientContents.slice(0, 5).join(', ')}${clientContents.length > 5 ? '...' : ''}`);
                 } else {
-                    console.log(`[ELECTRON] ⚠️ Client path exists but is not a directory`);
+                    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] ⚠️ Client path exists but is not a directory`);
                 }
             } catch (e) {
-                console.log(`[ELECTRON] ❌ Client path not accessible: ${e.message}`);
+                if (CONFIG.DEV_MODE) console.log(`[ELECTRON] ❌ Client path not accessible: ${e.message}`);
                 // Try alternative paths
                 const altClientPath = path.join(__dirname, '..', 'dist', 'client');
-                console.log(`[ELECTRON] Trying alternative client path: ${altClientPath}`);
+                if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Trying alternative client path: ${altClientPath}`);
                 try {
                     const altStat = require('fs').statSync(altClientPath);
                     if (altStat.isDirectory()) {
                         process.env.ELECTRON_CLIENT_PATH = altClientPath;
-                        console.log(`[ELECTRON] ✅ Using alternative client path`);
+                        if (CONFIG.DEV_MODE) console.log(`[ELECTRON] ✅ Using alternative client path`);
                     }
                 } catch (e2) {
-                    console.log(`[ELECTRON] ❌ Alternative client path also failed: ${e2.message}`);
+                    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] ❌ Alternative client path also failed: ${e2.message}`);
                 }
             }
             
             // Import and start the server in the same process
-            console.log(`[ELECTRON] Requiring server module...`);
+            if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Requiring server module...`);
             
             // Add the server's node_modules to the module path
             const serverNodeModules = path.join(serverInfo.workingDir, 'node_modules');
-            console.log(`[ELECTRON] Checking server node_modules at: ${serverNodeModules}`);
+            if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Checking server node_modules at: ${serverNodeModules}`);
             
             try {
                 const stat = require('fs').statSync(serverNodeModules);
                 if (stat.isDirectory()) {
-                    console.log(`[ELECTRON] ✅ Server node_modules is a valid directory`);
+                    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] ✅ Server node_modules is a valid directory`);
                     require('module')._nodeModulePaths.unshift(serverNodeModules);
                 } else {
-                    console.log(`[ELECTRON] ⚠️ Server node_modules exists but is not a directory`);
+                    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] ⚠️ Server node_modules exists but is not a directory`);
                 }
             } catch (e) {
-                console.log(`[ELECTRON] ⚠️ Server node_modules not accessible: ${e.message}`);
+                if (CONFIG.DEV_MODE) console.log(`[ELECTRON] ⚠️ Server node_modules not accessible: ${e.message}`);
             }
             
             // Don't change working directory for asar files - just set environment
-            console.log(`[ELECTRON] Setting up server environment without changing cwd`);
-            console.log(`[ELECTRON] Server working dir (env only): ${serverInfo.workingDir}`);
+            if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Setting up server environment without changing cwd`);
+            if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Server working dir (env only): ${serverInfo.workingDir}`);
             
             // Set up module resolution for the server
             const Module = require('module');
@@ -162,13 +164,13 @@ function startServerWithPath(port, serverInfo) {
             
             try {
                 require(serverInfo.serverPath);
-                console.log(`[ELECTRON] Server loaded successfully`);
+                if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Server loaded successfully`);
                 
                 // Give the server a moment to start
                 setTimeout(() => {
                     // Restore original module resolution
                     Module._resolveFilename = originalResolveFilename;
-                    console.log(`[ELECTRON] Server startup completed`);
+                    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Server startup completed`);
                     resolve(true);
                 }, 3000);
                 
@@ -179,8 +181,8 @@ function startServerWithPath(port, serverInfo) {
             }
             
         } catch (error) {
-            console.error(`[ELECTRON] Failed to start server:`, error);
-            console.error(`[ELECTRON] Error stack:`, error.stack);
+            if (CONFIG.DEV_MODE) console.error(`[ELECTRON] Failed to start server:`, error);
+            if (CONFIG.DEV_MODE) console.error(`[ELECTRON] Error stack:`, error.stack);
             reject(error);
         }
     });
@@ -190,7 +192,7 @@ function startServerWithPath(port, serverInfo) {
  * Create the main application window directly for debugging
  */
 function createMainWindowDirect() {
-    console.log(`[ELECTRON] Creating debug window...`);
+    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Creating debug window...`);
     
     mainWindow = new BrowserWindow({
         width: CONFIG.WINDOW_WIDTH,
@@ -214,7 +216,7 @@ function createMainWindowDirect() {
     
     mainWindow.on('closed', () => {
         mainWindow = null;
-        console.log(`[ELECTRON] Main window closed`);
+        if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Main window closed`);
     });
 }
 
@@ -223,7 +225,7 @@ function createMainWindowDirect() {
  * @param {number} port - Port the server is running on
  */
 function createMainWindow(port) {
-    console.log(`[ELECTRON] Creating main window for port ${port}...`);
+    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Creating main window for port ${port}...`);
     
     mainWindow = new BrowserWindow({
         width: CONFIG.WINDOW_WIDTH,
@@ -258,7 +260,7 @@ function createMainWindow(port) {
     
     // Load the TableTalk app
     const serverUrl = `http://localhost:${port}`;
-    console.log(`[ELECTRON] Loading URL: ${serverUrl}`);
+    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Loading URL: ${serverUrl}`);
     
     mainWindow.loadURL(serverUrl);
     
@@ -266,6 +268,11 @@ function createMainWindow(port) {
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
         mainWindow.focus();
+        
+        // Set a global flag to indicate we're in Electron
+        mainWindow.webContents.executeJavaScript(`
+            window.IS_ELECTRON_APP = true;
+        `);
         
         // Only open dev tools in development mode
         if (CONFIG.DEV_MODE) {
@@ -282,12 +289,12 @@ function createMainWindow(port) {
     // Handle window closed
     mainWindow.on('closed', () => {
         mainWindow = null;
-        console.log(`[ELECTRON] Main window closed`);
+        if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Main window closed`);
     });
     
     // Handle load failures
     mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-        console.error(`[ELECTRON] Failed to load ${validatedURL}: ${errorDescription}`);
+        if (CONFIG.DEV_MODE) console.error(`[ELECTRON] Failed to load ${validatedURL}: ${errorDescription}`);
         
         // Show an error dialog
         dialog.showErrorBox(
@@ -343,9 +350,28 @@ function createApplicationMenu(port) {
                         dialog.showMessageBox(mainWindow, {
                             type: 'info',
                             title: 'About TableTalk',
-                            message: 'TableTalk v1.0.0',
+                            message: 'TableTalk v0.65.0',
                             detail: 'A desktop TTRPG chat application for your gaming sessions.\n\nBuilt with Electron and Socket.IO'
                         });
+                    }
+                },
+                { type: 'separator' },
+                {
+                    label: 'Tables Admin Panel',
+                    accelerator: 'CmdOrCtrl+T',
+                    click: () => {
+                        // Navigate to the TableAdmin page by simulating admin button click
+                        if (mainWindow && mainWindow.webContents) {
+                            mainWindow.webContents.executeJavaScript(`
+                                // Trigger admin view directly
+                                if (window.setAdminView) {
+                                    window.setAdminView(true);
+                                } else {
+                                    // Try to trigger it via React events
+                                    window.dispatchEvent(new CustomEvent('openAdminPanel'));
+                                }
+                            `);
+                        }
                     }
                 },
                 { type: 'separator' },
@@ -364,29 +390,26 @@ function createApplicationMenu(port) {
                     accelerator: 'CmdOrCtrl+I',
                     click: () => {
                         const urls = getNetworkUrls(currentPort);
-                        const urlList = urls.map(u => `${u.type}: ${u.url}`).join('\n');
+                        const networkUrls = urls.filter(u => u.type === 'Network');
                         const qrUrl = `http://localhost:${currentPort}/qr-code.svg`;
                         
-                        dialog.showMessageBox(mainWindow, {
-                            type: 'info',
-                            title: 'Player Connection Info',
-                            message: 'Share these URLs with your players:',
-                            detail: `${urlList}\n\nQR Code: ${qrUrl}\n\nPlayers can use any of these URLs to join your game.`
-                        });
-                    }
-                },
-                {
-                    label: 'Copy Local URL',
-                    click: () => {
-                        const localUrl = `http://localhost:${currentPort}`;
-                        clipboard.writeText(localUrl);
-                        
-                        dialog.showMessageBox(mainWindow, {
-                            type: 'info',
-                            title: 'Copied!',
-                            message: 'Local URL copied to clipboard',
-                            detail: localUrl
-                        });
+                        if (networkUrls.length > 0) {
+                            const urlList = networkUrls.map(u => `${u.type}: ${u.url}`).join('\n');
+                            
+                            dialog.showMessageBox(mainWindow, {
+                                type: 'info',
+                                title: 'Player Connection Info',
+                                message: 'Share these URLs with your players:',
+                                detail: `${urlList}\n\nQR Code: ${qrUrl}\n\nPlayers can use any of these URLs to join your game.`
+                            });
+                        } else {
+                            dialog.showMessageBox(mainWindow, {
+                                type: 'warning',
+                                title: 'No Network Connection',
+                                message: 'No network URL available',
+                                detail: 'Make sure you are connected to a network to share with other devices.'
+                            });
+                        }
                     }
                 },
                 {
@@ -477,19 +500,19 @@ function createApplicationMenu(port) {
  * Initialize the application - production version
  */
 async function initializeApp() {
-    console.log(`[ELECTRON] Starting TableTalk...`);
+    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Starting TableTalk...`);
     
     try {
         // Find an available port
         const port = await findAvailablePort();
-        console.log(`[ELECTRON] Using port: ${port}`);
+        if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Using port: ${port}`);
         
         // Get server file path
         const serverInfo = await getServerPath();
         
         // Start the server
         await startServerProduction(port, serverInfo);
-        console.log(`[ELECTRON] Server started successfully`);
+        if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Server started successfully`);
         
         // Create the main window
         createMainWindow(port);
@@ -497,10 +520,10 @@ async function initializeApp() {
         // Create the application menu with connection info
         createApplicationMenu(port);
         
-        console.log(`[ELECTRON] TableTalk ready!`);
+        if (CONFIG.DEV_MODE) console.log(`[ELECTRON] TableTalk ready!`);
         
     } catch (error) {
-        console.error(`[ELECTRON] Startup failed:`, error);
+        if (CONFIG.DEV_MODE) console.error(`[ELECTRON] Startup failed:`, error);
         
         // Show error dialog
         dialog.showErrorBox(
@@ -530,15 +553,32 @@ async function getServerPath() {
         }
     }
     
-    // In packaged mode - use the standard path we know works
+    // In packaged mode - server files are in the asar bundle
     const serverPath = path.join(__dirname, 'dist', 'server', 'server', 'server.js');
+    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Checking server path: ${serverPath}`);
+    
     if (fs.existsSync(serverPath)) {
+        if (CONFIG.DEV_MODE) console.log(`[ELECTRON] ✅ Server file found`);
         return {
             serverPath: serverPath,
             workingDir: path.dirname(serverPath)
         };
     } else {
-        throw new Error('Server files not found in application bundle.');
+        if (CONFIG.DEV_MODE) console.log(`[ELECTRON] ❌ Server file not found, trying alternative paths...`);
+        
+        // Try alternative path - sometimes the asar structure differs
+        const altServerPath = path.join(__dirname, 'dist', 'server', 'server.js');
+        if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Trying alternative path: ${altServerPath}`);
+        
+        if (fs.existsSync(altServerPath)) {
+            if (CONFIG.DEV_MODE) console.log(`[ELECTRON] ✅ Server file found at alternative path`);
+            return {
+                serverPath: altServerPath,
+                workingDir: path.dirname(altServerPath)
+            };
+        }
+        
+        throw new Error(`Server files not found. Checked: ${serverPath} and ${altServerPath}`);
     }
 }
 
@@ -553,16 +593,24 @@ function startServerProduction(port, serverInfo) {
             process.env.ELECTRON_MODE = 'true';
             process.env.ELECTRON_CLIENT_PATH = path.join(__dirname, 'dist', 'client');
             
+            if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Port: ${port}`);
+            if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Server path: ${serverInfo.serverPath}`);
+            if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Client path: ${process.env.ELECTRON_CLIENT_PATH}`);
+            if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Working dir: ${serverInfo.workingDir}`);
+            
             // Load the server
             require(serverInfo.serverPath);
+            if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Server module loaded successfully`);
             
             // Give the server time to start
             setTimeout(() => {
+                if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Server startup timeout completed`);
                 resolve(true);
-            }, 2000);
+            }, 3000);
             
         } catch (error) {
-            console.error(`[ELECTRON] Server startup failed:`, error);
+            if (CONFIG.DEV_MODE) console.error(`[ELECTRON] Server startup failed:`, error);
+            if (CONFIG.DEV_MODE) console.error(`[ELECTRON] Error stack:`, error.stack);
             reject(error);
         }
     });
@@ -572,7 +620,7 @@ function startServerProduction(port, serverInfo) {
  * Clean up when the app is quitting
  */
 function cleanup() {
-    console.log(`[ELECTRON] Cleaning up...`);
+    if (CONFIG.DEV_MODE) console.log(`[ELECTRON] Cleaning up...`);
     // Server runs in the same process, so cleanup happens automatically
 }
 
@@ -598,11 +646,11 @@ app.on('will-quit', cleanup);
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
-    console.error(`[ELECTRON] Uncaught exception:`, error);
+    if (CONFIG.DEV_MODE) console.error(`[ELECTRON] Uncaught exception:`, error);
     cleanup();
     app.quit();
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-    console.error(`[ELECTRON] Unhandled rejection at:`, promise, 'reason:', reason);
+    if (CONFIG.DEV_MODE) console.error(`[ELECTRON] Unhandled rejection at:`, promise, 'reason:', reason);
 });

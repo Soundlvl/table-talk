@@ -8,12 +8,12 @@ interface TableSelectionProps {
   socket: Socket | null;
   isConnected: boolean;
   onTableSelected: (tableId: string) => void;
-  onEnterAdmin: () => void;
 }
 
-function TableSelection({ socket, isConnected, onTableSelected, onEnterAdmin }: TableSelectionProps) {
+function TableSelection({ socket, isConnected, onTableSelected }: TableSelectionProps) {
   const [tables, setTables] = useState<Table[]>([]);
   const [newTableName, setNewTableName] = useState('');
+  
 
   useEffect(() => {
     if (socket && isConnected) {
@@ -116,9 +116,6 @@ function TableSelection({ socket, isConnected, onTableSelected, onEnterAdmin }: 
         </div>
       </div>
       
-      <footer className="admin-panel-footer">
-        <button onClick={onEnterAdmin} className="admin-panel-button">Admin Panel</button>
-      </footer>
     </div>
   );
 }

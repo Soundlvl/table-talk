@@ -101,6 +101,27 @@ function App() {
   const [hasScrolledInitially, setHasScrolledInitially] = useState<boolean>(false);
   const [isAdminView, setIsAdminView] = useState<boolean>(false);
   const [hasPendingInvite, setHasPendingInvite] = useState<boolean>(false);
+  
+  // Check if running in Electron - only allow admin access in Electron app
+  const isElectron = !!(window as any).IS_ELECTRON_APP;
+  
+  // Expose admin view setter for Electron menu
+  useEffect(() => {
+    if (isElectron) {
+      (window as any).setAdminView = setIsAdminView;
+      
+      const handleOpenAdminPanel = () => {
+        setIsAdminView(true);
+      };
+      
+      window.addEventListener('openAdminPanel', handleOpenAdminPanel);
+      
+      return () => {
+        window.removeEventListener('openAdminPanel', handleOpenAdminPanel);
+        delete (window as any).setAdminView;
+      };
+    }
+  }, [isElectron]);
   const [theme, setTheme] = useState<string>('fantasy');
   const [isHighContrastMode, setIsHighContrastMode] = useState<boolean>(() => {
     try {
@@ -496,7 +517,7 @@ function App() {
     }
   };
 
-  if (isAdminView) {
+  if (isAdminView && isElectron) {
     return (
       <TableAdmin 
         socket={socket} 
@@ -512,7 +533,6 @@ function App() {
         socket={socket} 
         isConnected={isConnected} 
         onTableSelected={handleJoinTableRequest}
-        onEnterAdmin={() => setIsAdminView(true)}
       />
     );
   }

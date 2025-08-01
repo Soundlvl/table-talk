@@ -1,6 +1,6 @@
 {
   "name": "table-talk-electron",
-  "version": "1.0.0",
+  "version": "0.65.0",
   "description": "TableTalk - Desktop TTRPG Chat Application",
   "main": "main.js",
   "author": "Kevin McSharry",
@@ -13,9 +13,10 @@
     "build:prepare": "npm run copy:server && npm run copy:client",
     "copy:server": "npx cpx2 \"../server/dist/**/*\" \"dist/server\" && npx cpx2 \"../server/node_modules/**/*\" \"dist/server/node_modules\"",
     "copy:client": "npx cpx2 \"../client/dist/**/*\" \"dist/client\"",
-    "build:win": "npm run build:prepare && electron-builder --win",
-    "build:mac": "npm run build:prepare && electron-builder --mac",
-    "build:linux": "npm run build:prepare && electron-builder --linux",
+    "build:win": "npm run build:prepare && electron-builder --win --publish=never",
+    "build:mac": "npm run build:prepare && electron-builder --mac --publish=never",
+    "build:linux": "npm run build:prepare && electron-builder --linux --publish=never",
+    "build:all": "npm run build:prepare && electron-builder --mac --win --linux --publish=never",
     "clean": "rmdir /S /Q dist"
   },
   "devDependencies": {
@@ -25,6 +26,7 @@
   },
   "dependencies": {
     "@dice-roller/rpg-dice-roller": "^5.5.1",
+    "asar": "^3.2.0",
     "qrcode": "^1.5.3",
     "socket.io": "^4.8.1",
     "uuid": "^11.1.0"
@@ -51,11 +53,15 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "assets/icon.ico"
@@ -64,14 +70,22 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "icon": "assets/icon.icns",
       "category": "public.app-category.games"
     },
     "linux": {
-      "target": "AppImage",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64", "arm64"]
+        }
+      ],
       "icon": "assets/icon.png",
       "category": "Game"
     },

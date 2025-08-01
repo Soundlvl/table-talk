@@ -10,7 +10,6 @@ interface ConnectionHandlerContext {
   io: ServerIoType;
   gameTables: GameTables;
   utils: Utils;
-  ADMIN_PASSWORD: string; // Password is now passed in context
 }
 
 // Helper function to handle session cleanup for a character.
@@ -55,7 +54,7 @@ function cleanupCharacterConnection(socket: ServerSocketType, context: Connectio
 
 
 export function onNewConnection(socket: ServerSocketType, context: ConnectionHandlerContext): void {
-  const { io, gameTables, utils, ADMIN_PASSWORD } = context;
+  const { io, gameTables, utils } = context;
   console.log(`[CONNECTION] A client connected: ${socket.id}`);
   
   // ---
@@ -98,18 +97,14 @@ export function onNewConnection(socket: ServerSocketType, context: ConnectionHan
 
   const adminContext = { io, gameTables, utils };
   
-  socket.on('admin:authenticate', (password: string) => {
-    if (ADMIN_PASSWORD && password === ADMIN_PASSWORD) {
-        console.log(`[AUTH] Admin access granted to socket ${socket.id}`);
-        socket.data.isAdmin = true;
-        socket.emit('admin:authResult', { success: true });
-        // After successful auth, immediately fetch the tables for the admin.
-        adminHandler.handleGetTables(socket, adminContext);
-    } else {
-        console.warn(`[AUTH] Failed admin login attempt from socket ${socket.id}`);
-        socket.data.isAdmin = false;
-        socket.emit('admin:authResult', { success: false, message: 'Invalid password.' });
-    }
+  // Auto-grant admin access - no password required
+  console.log(`[AUTH] Auto-granting admin access to socket ${socket.id}`);
+  socket.data.isAdmin = true;
+  
+  socket.on('admin:authenticate', () => {
+    // Always successful - no password required
+    socket.emit('admin:authResult', { success: true });
+    adminHandler.handleGetTables(socket, adminContext);
   });
   
   socket.on('admin:getTables', () => adminHandler.handleGetTables(socket, adminContext));

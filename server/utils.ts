@@ -24,10 +24,12 @@ export function sanitizeForFilename(name: string): string {
 const getBaseDir = () => {
     // Check if running under Electron
     if (process.env.ELECTRON_MODE === 'true') {
-        // In Electron mode, use the current working directory (temp directory where the app extracts)
-        // This ensures we write to a writable location outside the asar file
-        console.log(`[UTILS] Electron mode detected - using cwd for data directory: ${process.cwd()}`);
-        return process.cwd();
+        // In Electron mode, use the user's data directory for persistent storage
+        // This ensures we write to a writable location that persists between app launches
+        const os = require('os');
+        const userDataPath = path.join(os.homedir(), 'Documents', 'TableTalk');
+        console.log(`[UTILS] Electron mode detected - using user data directory: ${userDataPath}`);
+        return userDataPath;
     }
     
     // `process.pkg` is a special flag set by the pkg tool
@@ -47,6 +49,16 @@ const getBaseDir = () => {
 };
 
 const projectRoot = getBaseDir();
+
+// Ensure the base directory exists (especially important for Electron apps)
+try {
+    if (!fsSync.existsSync(projectRoot)) {
+        fsSync.mkdirSync(projectRoot, { recursive: true });
+        console.log(`[UTILS] Created base directory: ${projectRoot}`);
+    }
+} catch (error) {
+    console.error(`[UTILS] Failed to create base directory ${projectRoot}:`, error);
+}
 
 // All data directories will now correctly resolve based on the environment
 export const TABLES_DIR = path.join(projectRoot, 'tables');

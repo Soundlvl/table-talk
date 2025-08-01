@@ -125,8 +125,9 @@ npm run build
 cd ../server
 npm run build
 
-# Run in development mode
+# Prepare files for electron and run in development mode
 cd ../electron
+npm run build:prepare
 npm run dev
 ```
 
@@ -135,12 +136,17 @@ npm run dev
 # Prepare and build for current platform
 cd electron
 npm run build
-S
+
 # Build for specific platforms
 npm run build:win    # Windows
-npm run build:mac    # macOS
+npm run build:mac    # macOS (requires macOS or CI/CD)
 npm run build:linux  # Linux
 ```
+
+**Platform Build Requirements:**
+- **Windows builds**: Can be built on Windows, macOS, or Linux
+- **Linux builds**: Can be built on Windows, macOS, or Linux  
+- **macOS builds**: Require macOS or cloud CI/CD (GitHub Actions recommended)
 
 
 ### Tech Stack

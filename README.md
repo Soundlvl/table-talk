@@ -1,4 +1,4 @@
-# 🎲 TableTalk
+# TableTalk
 
 <div align="center">
   <img src="client/public/TT.png" alt="TableTalk Logo" width="200"/>

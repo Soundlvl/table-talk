@@ -45,7 +45,7 @@
 ### For Game Masters
 
 1. **Download the latest release** from the [Releases page](../../releases)
-2. **Launch TableTalk** to install and automatically start the server
+2. **Run the installer** or open the portable version to automatically start the server
 3. **Share connection info** with your players via the built-in QR code or URLs
 4. **Create your table** and manage your campaign
 

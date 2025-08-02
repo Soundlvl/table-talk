@@ -36,7 +36,6 @@
 - **GM Omniscience**: The Game Master always understands all languages and sees all private messages
 
 ### **Cross-Platform Desktop App**
-- **No Installation Required**: Portable executable files
 - **Windows, macOS, Linux**: Built with Electron for universal compatibility
 - **QR Code Sharing**: Quick mobile device connections
 - **Network Discovery**: Automatic local network connection URLs

@@ -42,18 +42,18 @@
 
 ## Download & Installation
 
+### For Game Masters
+
+1. **Download the latest release** from the [Releases page](../../releases)
+2. **Launch TableTalk** to install and automatically start the server
+3. **Share connection info** with your players via the built-in QR code or URLs
+4. **Create your table** and manage your campaign
+
 ### For Players
 
 1. **Connect with a browser** Get the url or scan the QR code from your Game Master
 2. **Join your table** and create your character
 3. **Start gaming!**
-
-### For Game Masters
-
-1. **Download the latest release** from the [Releases page](../../releases)
-2. **Launch TableTalk** to automatically start the server
-3. **Share connection info** with your players via the built-in QR code or URLs
-4. **Create your table** and manage your campaign
 
 ## Quick Start
 

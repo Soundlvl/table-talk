@@ -33,7 +33,7 @@
 - **Player Language Control**: Grant or remove character languages
 - **Chat Export**: Save entire game sessions as JSON files
 - **Player Management Dashboard**: Comprehensive GM controls
-- **GM Omnicience**: The Game Master always understands all languages and sees all private messages
+- **GM Omniscience**: The Game Master always understands all languages and sees all private messages
 
 ### **Cross-Platform Desktop App**
 - **No Installation Required**: Portable executable files
@@ -60,14 +60,15 @@
 
 ### Creating a Game (GM)
 1. Launch TableTalk
-2. Create a new table with your campaign name
-3. Set up world languages and pick a theme from the GM menue
-4. Share the connection URL or QR code with players
-5. Start your adventure!
+2. Allow access to local network
+3. Create a new table with your campaign name
+4. Set up world languages and pick a theme from the GM menue
+5. Share the connection URL or QR code with players
+6. Start your adventure!
 
 ### Joining a Game (Player)
 1. Navigate to the GM's server URL
-2. Select your campain's table from the list
+2. Select your campaing's table from the list
 3. Create your character:
    - Choose a character name
    - Select known languages
